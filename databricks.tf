@@ -82,3 +82,16 @@ resource "databricks_metastore_assignment" "default_metastore" {
   workspace_id = databricks_mws_workspaces.workspace.workspace_id
   metastore_id = var.databricks_metastore_id
 }
+
+# Enable Compliance Security Profile (CSP) on the Databricks Workspace.
+resource "databricks_compliance_security_profile_workspace_setting" "this" {
+
+  providers = {
+    databricks = databricks.created_workspace
+  }
+
+  compliance_security_profile_workspace {
+    is_enabled           = true
+    compliance_standards = var.compliance_standards
+  }
+}
