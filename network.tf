@@ -9,52 +9,41 @@ resource "aws_subnet" "private" {
 
   region = var.region
 
-  availability_zone                              = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) > 0 ? element(var.azs, count.index) : null
-  availability_zone_id                           = length(regexall("^[a-z]{2}-", element(var.azs, count.index))) == 0 ? element(var.azs, count.index) : null
-  cidr_block                                     = element(concat(var.private_subnets, [""]), count.index)
+  availability_zone                              = length(regexall("^[a-z]{2}-", element(local.azs, count.index))) > 0 ? element(local.azs, count.index) : null
+  availability_zone_id                           = length(regexall("^[a-z]{2}-", element(local.azs, count.index))) == 0 ? element(local.azs, count.index) : null
+  cidr_block                                     = element(concat(var.private_subnets_cidr, [""]), count.index)
   vpc_id                                         = local.vpc_id
 
   tags = merge(
     {
-      Name = try(
-        var.private_subnet_names[count.index],
-        format("${var.name}-${var.private_subnet_suffix}-%s", element(var.azs, count.index))
-      )
+      Name = format("${var.resource_prefix}-private-%s", element(local.azs, count.index))
     },
-    var.tags,
-    var.private_subnet_tags,
-    lookup(var.private_subnet_tags_per_az, element(var.azs, count.index), {})
+    var.tags
   )
 }
 
 resource "aws_route_table" "private" {
-  count = local.create_private_subnets && local.max_subnet_length > 0 ? local.nat_gateway_count : 0
-
   region = var.region
 
-  vpc_id = local.vpc_id
+  vpc_id = var.vpc_id
 
   tags = merge(
     {
-      "Name" = var.single_nat_gateway ? "${var.name}-${var.private_subnet_suffix}" : format(
-        "${var.name}-${var.private_subnet_suffix}-%s",
-        element(var.azs, count.index),
-      )
+      "Name" = "${var.resource_prefix}-private"
     },
-    var.tags,
-    var.private_route_table_tags,
+    var.tags
   )
 }
 
 resource "aws_route_table_association" "private" {
-  count = local.create_private_subnets ? local.len_private_subnets : 0
+  count = 3
 
   region = var.region
 
   subnet_id = element(aws_subnet.private[*].id, count.index)
   route_table_id = element(
     aws_route_table.private[*].id,
-    var.single_nat_gateway ? 0 : count.index,
+    count.index,
   )
 }
 
