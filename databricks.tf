@@ -71,3 +71,14 @@ resource "databricks_mws_workspaces" "workspace" {
 
   depends_on = [databricks_mws_networks.this]
 }
+
+# Metastore Assignment
+resource "databricks_metastore_assignment" "default_metastore" {
+
+  providers = {
+    databricks = databricks.mws
+  }
+
+  workspace_id = databricks_mws_workspaces.workspace.workspace_id
+  metastore_id = var.databricks_metastore_id
+}
