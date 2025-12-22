@@ -1,7 +1,109 @@
+# High Level AWS Variables
 variable "region" {
   description = "The primary AWS region to deploy resources to"
   type        = string
   default     = "eu-west-2"
+}
+
+variable "aws_account_id" {
+  description = "ID of the AWS account."
+  type        = string
+  sensitive   = true
+}
+
+variable "aws_partition" {
+  description = "AWS partition to use for ARNs and policies"
+  type        = string
+  default     = "aws"
+}
+
+# High Level Databricks Variables
+variable "databricks_account_id" {
+  description = "ID of the Databricks account to deploy to."
+  type        = string
+  sensitive   = true
+}
+
+variable "databricks_provider_host" {
+  description = "Databricks provider host URL"
+  type        = string
+  default     = "https://accounts.cloud.databricks.com"
+}
+
+variable "databricks_metastore_id" {
+  description = "ID of the Databricks metastore for the current cloud region and Databricks account"
+  type        = string
+  default     = null
+}
+
+# Customer-managed VPC Networking Configuration. Keep subnets in case Core Cloud decide to centralise vending of them
+variable "vpc_id" {
+  description = "Custom VPC ID"
+  type        = string
+  default     = null
+}
+
+variable "vpc_cidr" {
+  description = "Custom VPC CIDR"
+  type        = string
+  default     = null
+}
+
+variable "private_subnet_ids" {
+  description = "List of custom private subnet IDs"
+  type        = list(string)
+  default     = null
+}
+
+variable "private_subnets_cidr" {
+  description = "CIDR blocks for private subnets."
+  type        = list(string)
+  nullable    = true
+  default     = [null]
+}
+
+variable "sg_egress_ports" {
+  description = "List of egress ports for security groups."
+  type        = list(string)
+  nullable    = true
+  default     = [null]
+}
+
+# Databricks variables
+variable "databricks_scc_vpce_id" {
+  description = "ID of the Databricks VPC endpoint registration for SCC Relay"
+  type        = string
+  default     = null
+}
+
+variable "databricks_rest_vpce_id" {
+  description = "ID of the Databricks VPC endpoint registration for REST"
+  type        = string
+  default     = null
+}
+
+variable "databricks_workspace_storage_key_id" {
+  description = "ID of the Databricks encryption key to use for encrypting workspace storage."
+  type        = string
+  default     = null
+}
+
+variable "databricks_managed_services_key_id" {
+  description = "ID of the Databricks encryption key to use for encrypting managed services."
+  type        = string
+  default     = null
+}
+
+variable "databricks_private_access_settings_id" {
+  description = "ID of the Databricks Private Access Settings (PAS) object to use for frontend PrivateLink to the workspace."
+  type        = string
+  default     = null
+}
+
+variable "databricks_network_policy_id" {
+  description = "ID of the Databricks Network Policy object to apply to this workspace."
+  type        = string
+  default     = null
 }
 
 variable "admin_user" {
@@ -24,75 +126,11 @@ variable "audit_log_delivery_exists" {
   default     = false
 }
 
-variable "aws_account_id" {
-  description = "ID of the AWS account."
-  type        = string
-  sensitive   = true
-}
-
-variable "aws_partition" {
-  description = "AWS partition to use for ARNs and policies"
-  type        = string
-  default     = "aws"
-}
-
-variable "cmk_admin_arn" {
-  description = "Amazon Resource Name (ARN) of the CMK admin."
-  type        = string
-  default     = null
-}
-
+# Databricks compliance and security (inc. SAT)
 variable "compliance_standards" {
   description = "List of compliance standards."
   type        = list(string)
   nullable    = true
-}
-
-variable "custom_private_subnet_ids" {
-  description = "List of custom private subnet IDs"
-  type        = list(string)
-  default     = null
-}
-
-variable "custom_relay_vpce_id" {
-  description = "Custom Relay VPC Endpoint ID"
-  type        = string
-  default     = null
-}
-
-variable "custom_rest_vpce_id" {
-  description = "Custom REST VPC Endpoint ID"
-  type        = string
-  default     = null
-}
-
-variable "custom_sg_id" {
-  description = "Custom security group ID"
-  type        = string
-  default     = null
-}
-
-variable "custom_vpc_id" {
-  description = "Custom VPC ID"
-  type        = string
-  default     = null
-}
-
-variable "databricks_account_id" {
-  description = "ID of the Databricks account."
-  type        = string
-  sensitive   = true
-}
-
-variable "databricks_provider_host" {
-  description = "Databricks provider host URL"
-  type        = string
-  default     = null # Will be computed based on databricks_gov_shard
-
-  validation {
-    condition     = var.databricks_provider_host == null || can(regex("^https://(accounts|accounts-dod)\\.cloud\\.databricks\\.(com|us|mil)$", var.databricks_provider_host))
-    error_message = "Invalid databricks_provider_host. Must be a valid Databricks accounts URL."
-  }
 }
 
 variable "enable_compliance_security_profile" {
@@ -109,44 +147,7 @@ variable "enable_security_analysis_tool" {
   default     = false
 }
 
-variable "metastore_exists" {
-  description = "If a metastore exists"
-  type        = bool
-}
-
-variable "private_subnets_cidr" {
-  description = "CIDR blocks for private subnets."
-  type        = list(string)
-  nullable    = true
-  default     = [null]
-}
-
-# Region name configuration
-# This variable allows mapping regions to multiple name properties:
-# - primary_name: The main region name (required)
-# - secondary_name: An optional secondary region name (e.g., for DoD)
-#
-# Example usage:
-# var.region_name_config["eu-west-2"].primary_name   # Get primary name
-# var.region_name_config["eu-west-2"].secondary_name # Get secondary name
-# var.region_name_config["eu-west-2"].region_type    # Get region type
-variable "region_name_config" {
-  description = "Region name configuration with multiple properties per region"
-  type = map(object({
-    primary_name   = string
-    secondary_name = optional(string)
-    region_type    = optional(string, "commercial")
-  }))
-  default = {
-    "eu-west-1" = {
-      primary_name = "ireland"
-    }
-    "eu-west-2" = {
-      primary_name = "london"
-    }
-  }
-}
-
+# Common variables to be applied to a large number of resources
 variable "resource_prefix" {
   description = "Prefix for the resource names."
   type        = string
@@ -155,13 +156,6 @@ variable "resource_prefix" {
     condition     = can(regex("^[a-z0-9-.]{1,26}$", var.resource_prefix))
     error_message = "Invalid resource prefix. Allowed 40 characters containing only a-z, 0-9, -, ."
   }
-}
-
-variable "sg_egress_ports" {
-  description = "List of egress ports for security groups."
-  type        = list(string)
-  nullable    = true
-  default     = [null]
 }
 
 variable "tags" {
