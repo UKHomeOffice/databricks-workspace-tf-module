@@ -43,8 +43,8 @@ variable "vpc_id" {
   default     = null
 }
 
-variable "vpc_cidr" {
-  description = "Custom VPC CIDR"
+variable "vpc_cidr_range" {
+  description = "Custom VPC CIDR range. e.g. 10.0.0.0/22"
   type        = string
   default     = null
 }
