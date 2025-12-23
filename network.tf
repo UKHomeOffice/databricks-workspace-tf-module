@@ -4,47 +4,23 @@ data "aws_prefix_list" "s3" {
 }
 
 # Private Subnets for the Workspace Network Configuration
-resource "aws_subnet" "private" {
-  count = 3
+resource "aws_subnet" "private_compute" {
+  for_each = var.private_compute_subnet_config
 
-  region = var.region
+  vpc_id            = var.vpc_id
+  cidr_block        = each.value.cidr
+  availability_zone = each.value.az
 
-  availability_zone                              = length(regexall("^[a-z]{2}-", element(local.azs, count.index))) > 0 ? element(local.azs, count.index) : null
-  availability_zone_id                           = length(regexall("^[a-z]{2}-", element(local.azs, count.index))) == 0 ? element(local.azs, count.index) : null
-  cidr_block                                     = element(concat(var.private_subnets_cidr, [""]), count.index)
-  vpc_id                                         = local.vpc_id
-
-  tags = merge(
-    {
-      Name = format("${var.resource_prefix}-private-%s", element(local.azs, count.index))
-    },
-    var.tags
-  )
+  tags = merge(local.common_tags, {
+    Name = "${var.resource_prefix}-private-compute-${each.key}"
+  })
 }
 
-resource "aws_route_table" "private" {
-  region = var.region
+resource "aws_route_table_association" "private_compute" {
+  for_each = aws_subnet.private_compute
 
-  vpc_id = var.vpc_id
-
-  tags = merge(
-    {
-      "Name" = "${var.resource_prefix}-private"
-    },
-    var.tags
-  )
-}
-
-resource "aws_route_table_association" "private" {
-  count = 3
-
-  region = var.region
-
-  subnet_id = element(aws_subnet.private[*].id, count.index)
-  route_table_id = element(
-    aws_route_table.private[*].id,
-    count.index,
-  )
+  subnet_id      = each.value.id
+  route_table_id = var.private_route_table_id
 }
 
 # Security group for Compute Clusters
