@@ -49,17 +49,16 @@ variable "vpc_cidr_range" {
   default     = null
 }
 
-variable "private_subnet_ids" {
+variable "private_compute_subnet_config" {
   description = "List of custom private subnet IDs"
-  type        = list(string)
+  type        = map(list(string))
   default     = null
 }
 
-variable "private_subnets_cidr" {
-  description = "CIDR blocks for private subnets."
-  type        = list(string)
-  nullable    = true
-  default     = [null]
+variable "private_route_table_id" {
+  description = "ID of the private route table to associate the backend PrivateLink endpoint subnets with"
+  type        = string
+  default     = null
 }
 
 variable "sg_egress_ports" {
