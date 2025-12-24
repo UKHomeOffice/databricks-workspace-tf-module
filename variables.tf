@@ -61,6 +61,12 @@ variable "private_route_table_id" {
   default     = null
 }
 
+variable "security_group_ids" {
+  description = "Security group ID"
+  type        = list(string)
+  default     = null
+}
+
 variable "sg_egress_ports" {
   description = "List of egress ports for security groups."
   type        = list(string)
