@@ -23,6 +23,37 @@ resource "aws_route_table_association" "private_compute" {
   route_table_id = var.private_route_table_id
 }
 
+# NACL for Databricks private compute subnets
+resource "aws_network_acl" "private_compute" {
+  vpc_id    = var.vpc_id
+  subnet_ids = [for s in aws_subnet.private_compute : s.id]
+
+  ingress {
+    rule_no    = 100
+    protocol   = "-1"
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
+  }
+
+  egress {
+    rule_no    = 100
+    protocol   = "-1"
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
+  }
+
+  tags = merge(
+    var.tags, 
+    {
+      Name = "${var.resource_prefix}-nacl-private-compute"
+    }
+  )
+}
+
 # Security group for Compute Clusters
 resource "aws_security_group" "sg" {
   name   = "${var.resource_prefix}-workspace-sg"
