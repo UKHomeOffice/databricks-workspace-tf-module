@@ -69,6 +69,13 @@ variable "sg_egress_ports" {
 }
 
 # Databricks variables
+variable "deployment_name" {
+  description = "Deployment name for the workspace. Must first be enabled by a Databricks representative."
+  default     = null
+  type        = string
+  nullable    = true
+}
+
 variable "databricks_scc_vpce_id" {
   description = "ID of the Databricks VPC endpoint registration for SCC Relay"
   type        = string
@@ -109,8 +116,8 @@ variable "artifact_storage_bucket" {
   description = "Artifact storage bucket for VPC endpoint policy."
   type        = map(list(string))
   default = {
-    "eu-west-1"      = ["databricks-prod-artifacts-eu-west-1"]
-    "eu-west-2"      = ["databricks-prod-artifacts-eu-west-2"]
+    "eu-west-1" = ["databricks-prod-artifacts-eu-west-1"]
+    "eu-west-2" = ["databricks-prod-artifacts-eu-west-2"]
   }
 }
 
@@ -118,6 +125,12 @@ variable "audit_log_delivery_exists" {
   description = "If audit log delivery is already configured"
   type        = bool
   default     = false
+}
+
+# AWS variables
+variable "workspace_storage_key_arn" {
+  description = "ARN of the KMS key used for encryption of the S3 bucket used for workspace root."
+  type        = string
 }
 
 # Databricks compliance and security (inc. SAT)

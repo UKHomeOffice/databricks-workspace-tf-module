@@ -2,13 +2,13 @@
 
 # Cross Account Role
 data "databricks_aws_assume_role_policy" "this" {
-  external_id   = var.databricks_account_id
+  external_id = var.databricks_account_id
 }
 
 resource "aws_iam_role" "cross_account_role" {
   name               = "${var.resource_prefix}-cross-account"
   assume_role_policy = data.databricks_aws_assume_role_policy.this.json
-  tags = var.tags
+  tags               = var.tags
 }
 
 resource "aws_iam_role_policy" "cross_account" {

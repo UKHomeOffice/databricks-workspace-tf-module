@@ -11,9 +11,11 @@ resource "aws_subnet" "private_compute" {
   cidr_block        = each.value.cidr
   availability_zone = each.value.az
 
-  tags = merge(local.common_tags, {
-    Name = "${var.resource_prefix}-private-compute-${each.key}"
-  })
+  tags = merge(
+    var.tags, {
+      Name = "${var.resource_prefix}-private-compute-${each.key}"
+    }
+  )
 }
 
 resource "aws_route_table_association" "private_compute" {
@@ -25,7 +27,7 @@ resource "aws_route_table_association" "private_compute" {
 
 # NACL for Databricks private compute subnets
 resource "aws_network_acl" "private_compute" {
-  vpc_id    = var.vpc_id
+  vpc_id     = var.vpc_id
   subnet_ids = [for s in aws_subnet.private_compute : s.id]
 
   ingress {
@@ -47,7 +49,7 @@ resource "aws_network_acl" "private_compute" {
   }
 
   tags = merge(
-    var.tags, 
+    var.tags,
     {
       Name = "${var.resource_prefix}-nacl-private-compute"
     }
@@ -93,14 +95,12 @@ resource "aws_security_group" "sg" {
     }
   }
 
-  dynamic "egress" {
-    content {
-      description     = "S3 Gateway Endpoint - SG"
-      from_port       = 443
-      to_port         = 443
-      protocol        = "tcp"
-      prefix_list_ids = [data.aws_prefix_list.s3.id]
-    }
+  egress {
+    description     = "S3 Gateway Endpoint - SG"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    prefix_list_ids = [data.aws_prefix_list.s3.id]
   }
 
   tags = var.tags
