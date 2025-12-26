@@ -125,7 +125,7 @@ variable "compliance_standards" {
   description = "List of compliance standards."
   type        = list(string)
   nullable    = true
-  default     = "CYBER_ESSENTIAL_PLUS"
+  default     = ["CYBER_ESSENTIAL_PLUS"]
 }
 
 variable "enable_compliance_security_profile" {
