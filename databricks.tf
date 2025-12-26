@@ -14,7 +14,7 @@ resource "time_sleep" "wait_30_seconds" {
 
 resource "databricks_mws_credentials" "this" {
   provider         = databricks.mws
-  role_arn         = aws_iam_role.cross_account_role.arn
+  role_arn         = var.cross_account_role_arn
   credentials_name = "${var.resource_prefix}-credentials"
   depends_on       = [time_sleep.wait_30_seconds]
 }

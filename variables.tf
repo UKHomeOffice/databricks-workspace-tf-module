@@ -136,6 +136,11 @@ variable "workspace_storage_key_arn" {
   type        = string
 }
 
+variable "cross_account_role_arn" {
+  description = "AWS ARN of the cross-account role."
+  type        = string
+}
+
 # Databricks compliance and security (inc. SAT)
 variable "compliance_standards" {
   description = "List of compliance standards."
