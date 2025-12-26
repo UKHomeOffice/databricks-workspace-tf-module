@@ -44,8 +44,11 @@ variable "vpc_cidr_range" {
 }
 
 variable "private_compute_subnet_config" {
-  description = "List of custom private subnet IDs"
-  type        = map(list(string))
+  description = "Map of CIDRs and AZs to use when creating private subnet IDs"
+  type = map(object({
+    cidr = string
+    az   = string
+  }))
   default     = null
 }
 
