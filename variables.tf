@@ -105,11 +105,6 @@ variable "databricks_network_policy_id" {
   default     = null
 }
 
-variable "admin_user" {
-  description = "Email of the admin user for the workspace and workspace catalog."
-  type        = string
-}
-
 variable "artifact_storage_bucket" {
   description = "Artifact storage bucket for VPC endpoint policy."
   type        = map(list(string))
@@ -130,6 +125,7 @@ variable "compliance_standards" {
   description = "List of compliance standards."
   type        = list(string)
   nullable    = true
+  default     = "CYBER_ESSENTIAL_PLUS"
 }
 
 variable "enable_compliance_security_profile" {
