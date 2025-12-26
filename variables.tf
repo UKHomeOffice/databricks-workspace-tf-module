@@ -5,12 +5,6 @@ variable "region" {
   default     = "eu-west-2"
 }
 
-variable "aws_account_id" {
-  description = "ID of the AWS account."
-  type        = string
-  sensitive   = true
-}
-
 variable "aws_partition" {
   description = "AWS partition to use for ARNs and policies"
   type        = string
