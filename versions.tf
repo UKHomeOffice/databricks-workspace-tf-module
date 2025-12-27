@@ -38,5 +38,4 @@ provider "databricks" {
 provider "databricks" {
   alias      = "created_workspace"
   host       = databricks_mws_workspaces.workspace.workspace_url
-  account_id = var.databricks_account_id
 }
