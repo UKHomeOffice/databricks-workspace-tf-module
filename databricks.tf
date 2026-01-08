@@ -74,6 +74,8 @@ resource "databricks_mws_workspaces" "workspace" {
 # ==============================================================================
 
 resource "databricks_metastore_assignment" "default_metastore" {
+  provider = databricks.mws
+
   workspace_id = databricks_mws_workspaces.workspace.workspace_id
   metastore_id = var.databricks_metastore_id
 }
